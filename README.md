@@ -42,7 +42,7 @@ aws iam get-account-authorization-details --profile [profile] > aws-account-auth
 python3 oyen.py --input aws-account-authorization.json --csv --output results
 
 # Method 2
-python3 oyen.py --input singlePolicy.json --csv --output results
+python3 oyen.py --input singlePolicy.json --csv --output results --single
 ```
 
 ## Behind-the-scenes
