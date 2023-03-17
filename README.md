@@ -56,5 +56,5 @@ As the tool is an interpretation of what AWS Visual Editor validates (not an exa
 
 ## Future Enhancement
 The bug hunter... sometimes have bugs in itself... 
-* Refine ARN format checks. For example, `arn:aws:backup-gateway:*:*:hypervisor/*` is flagged as it does not fit the format of `arn:${Partition}:backup-gateway::${Account}:hypervisor/${HypervisorId}` based on the [documentation](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsbackupgateway.html#:~:text=gateway*-,Resource%20types%20defined%20by%20AWS%20Backup%20Gateway,-The%20following%20resource). 
+- [x] Refine ARN format checks. For example, `arn:aws:backup-gateway:*:*:hypervisor/*` is flagged as it does not fit the format of `arn:${Partition}:backup-gateway::${Account}:hypervisor/${HypervisorId}` based on the [documentation](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsbackupgateway.html#:~:text=gateway*-,Resource%20types%20defined%20by%20AWS%20Backup%20Gateway,-The%20following%20resource). 
 

@@ -63,6 +63,10 @@ def parseIAM(iamDocument):
 
     return policies
 
+def standardiseArnFormat(arn):
+    standardArn = "arn:${Partition}:" + arn.split(":")[2] + ":${Region}:${Account}:" + ":".join(arn.split(":")[5:])
+    return standardArn
+
 def parseServiceAuth(authDocument):
     services = {}
 
@@ -74,7 +78,7 @@ def parseServiceAuth(authDocument):
             for r in action["resourceTypes"]:
                 for fullResource in service["resourceTypes"]:
                     if fullResource["name"] == r["resourceType"]:
-                        resourceTypeList.append(fullResource["arnPattern"])
+                        resourceTypeList.append(standardiseArnFormat(fullResource["arnPattern"]))
         
             actionDict[action["name"].lower()] = resourceTypeList
 
@@ -157,9 +161,14 @@ def findBugs(iam, awsRef):
                 # All resources will pass the checks
                 continue
 
-            if isinstance(statement["Action"], str):
-                bugMessage = processBugMessage(statement["Action"], statement["Resource"], awsRef)
+            actionsList = statement["Action"]
 
+            if isinstance(statement["Action"], str):
+                actionsList = [statement["Action"]]
+
+            for action in actionsList:
+                bugMessage = processBugMessage(action, statement["Resource"], awsRef)
+                
                 if bugMessage:
                     if iam[policy]["arn"] not in errors:
                         errors[iam[policy]["arn"]] = {
@@ -167,17 +176,6 @@ def findBugs(iam, awsRef):
                         }
                     else:
                         errors[iam[policy]["arn"]]["errors"] = errors[iam[policy]["arn"]]["errors"] + bugMessage
-            else:
-                for action in statement["Action"]:
-                    bugMessage = processBugMessage(action, statement["Resource"], awsRef)
-                    
-                    if bugMessage:
-                        if iam[policy]["arn"] not in errors:
-                            errors[iam[policy]["arn"]] = {
-                                "errors": bugMessage
-                            }
-                        else:
-                            errors[iam[policy]["arn"]]["errors"] = errors[iam[policy]["arn"]]["errors"] + bugMessage
     
     return errors
 
@@ -251,11 +249,7 @@ if __name__ == "__main__":
         action='store_true'
     )
 
-    output = {}
-    try:
-        output = main(parser)
-    except:
-        print("Error running tool. Please check help or documentation for more information.")
+    output = main(parser)
     
     # Exit code 1 if there are bugs found
     if len(output) > 0:
